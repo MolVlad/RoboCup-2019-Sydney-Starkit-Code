@@ -33,6 +33,9 @@ option(ReadyState)
   {
     action
     {
+      // LeftAndRigth doesn't work here
+      HeadControlMode(HeadControl::lookLeftAndRight);
+
       if(theRobotInfo.number == 1)
         WalkToTargetPathPlanner(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f, R1X, R1Y));
       else if(theRobotInfo.number == 2)
@@ -46,23 +49,15 @@ option(ReadyState)
     }
     transition
     {
-      /*
-      if((theRobotInfo.number == 1) && (std::abs(theRobotPose.translation.x() - R1X) < 50.f) && (std::abs(theRobotPose.translation.y() - R1Y) < 50.f))
-        goto TurnToTarget_Ready;
-      if((theRobotInfo.number == 2) && (std::abs(theRobotPose.translation.x() - R2X) < 50.f) && (std::abs(theRobotPose.translation.y() - R2Y) < 50.f))
-        goto TurnToTarget_Ready;
-      if((theRobotInfo.number == 3) && (std::abs(theRobotPose.translation.x() - R3X) < 50.f) && (std::abs(theRobotPose.translation.y() - R3Y) < 50.f))
-        goto TurnToTarget_Ready;
-      if((theRobotInfo.number == 4) && (std::abs(theRobotPose.translation.x() - R4X) < 50.f) && (std::abs(theRobotPose.translation.y() - R4Y) < 50.f))
-        goto TurnToTarget_Ready;
-        */
+
     }
   }
-  state(Compeleted_Ready)
+  state(Completed_Ready)
   {
     action
     {
-      HeadControlMode(HeadControl::lookForward);
+      // LeftAndRigth doesn't work here
+      HeadControlMode(HeadControl::lookLeftAndRight);
       Stand();
     }
     transition
@@ -74,13 +69,13 @@ option(ReadyState)
   {
     action
     {
-      HeadControlMode(HeadControl::lookForward);
+      HeadControlMode(HeadControl::lookLeftAndRight);
       WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f, 0.f, 0.f));
     }
     transition
     {
       //if(std::abs(theBallModel.estimate.position.angle()) < 5_deg)
-        //goto Compeleted_Ready;
+        //goto Completed_Ready;
     }
   }
 }

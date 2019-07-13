@@ -1,0 +1,64 @@
+#define R4XP 500
+#define R4YP 2500
+
+#define R6XP 500
+#define R6YP -2500
+
+option(PlayingState)
+{
+  initial_state(demo)
+  {
+    action
+    {
+      Stand();
+    }
+    transition
+    {
+      goto PlayingWait;
+    }
+  }
+  state(PlayingWait)
+  {
+    action
+    {
+      HeadControlMode(HeadControl::lookLeftAndRight);
+      Stand();
+    }
+    transition
+    {
+      if(theFrameInfo.getTimeSince(theBallModel.timeWhenLastSeen) < 30000.f)
+        goto PlayingAttack;
+      if((theRobotInfo.number == 4) && ((std::abs(theRobotPose.translation.x() - R4XP) > 50.f) || (std::abs(theRobotPose.translation.y() - R4YP) > 50.f)))
+        goto WalkToTarget_Playing;
+      if((theRobotInfo.number == 6) && ((std::abs(theRobotPose.translation.x() - R6XP) > 50.f) || (std::abs(theRobotPose.translation.y() - R6YP) > 50.f)))
+        goto WalkToTarget_Playing;
+    }
+  }
+  state(WalkToTarget_Playing)
+  {
+    action
+    {
+      if(theRobotInfo.number == 4)
+        WalkToTargetPathPlanner(Pose2f(50.f, 50.f, 50.f), Pose2f(-90_deg, R4XP, R4YP));
+      else if(theRobotInfo.number == 6)
+        WalkToTargetPathPlanner(Pose2f(50.f, 50.f, 50.f), Pose2f(90_deg, R6XP, R6YP));
+    }
+    transition
+    {
+      if(theFrameInfo.getTimeSince(theBallModel.timeWhenLastSeen) < (theBehaviorParameters.ballNotSeenTimeOut + 30000.f))
+        goto PlayingAttack;
+    }
+  }
+  state(PlayingAttack)
+  {
+    action
+    {
+      Striker();
+    }
+    transition
+    {
+      if(theFrameInfo.getTimeSince(theBallModel.timeWhenLastSeen) > (theBehaviorParameters.ballNotSeenTimeOut + 30000.f))
+        goto WalkToTarget_Playing;
+    }
+  }
+}

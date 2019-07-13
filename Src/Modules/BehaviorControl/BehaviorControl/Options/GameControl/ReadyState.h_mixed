@@ -1,0 +1,62 @@
+#define R4XR -2000
+#define R4YR 2000
+
+#define R6XR -2000
+#define R6YR -2000
+
+/** behavior for the ready state */
+option(ReadyState)
+{
+  /* position has been reached -> stand and wait */
+  initial_state(InitReady)
+  {
+    action
+    {
+      HeadControlMode(HeadControl::lookForward);
+      Stand();
+    }
+    transition
+    {
+      goto WalkToTarget_Ready;
+    }
+  }
+  state(WalkToTarget_Ready)
+  {
+    action
+    {
+      if(theRobotInfo.number == 4)
+        WalkToTargetPathPlanner(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f, R4XR, R4YR));
+      else if(theRobotInfo.number == 6)
+        WalkToTargetPathPlanner(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f, R6XR, R6YR));
+    }
+    transition
+    {
+      // To do later
+    }
+  }
+  state(Completed_Ready)
+  {
+    action
+    {
+      HeadControlMode(HeadControl::lookLeftAndRight);
+      Stand();
+    }
+    transition
+    {
+
+    }
+  }
+  state(TurnToTarget_Ready)
+  {
+    action
+    {
+      HeadControlMode(HeadControl::lookLeftAndRight);
+      WalkToTarget(Pose2f(50.f, 50.f, 50.f), Pose2f(0.f, 0.f, 0.f));
+    }
+    transition
+    {
+      //if(std::abs(theBallModel.estimate.position.angle()) < 5_deg)
+        //goto Completed_Ready;
+    }
+  }
+}

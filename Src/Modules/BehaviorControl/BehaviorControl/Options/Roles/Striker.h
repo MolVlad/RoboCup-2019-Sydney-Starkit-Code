@@ -20,7 +20,7 @@ option(Striker)
     transition
     {
       if(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut)
-        goto searchForBall;
+        goto rotateHeadToSearch;
       if(std::abs(theBallModel.estimate.position.angle()) < 5_deg)
         goto walkToBall;
     }
@@ -36,7 +36,7 @@ option(Striker)
     transition
     {
       if(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut)
-        goto searchForBall;
+        goto rotateHeadToSearch;
       if(theBallModel.estimate.position.norm() < 500.f)
         goto alignToGoal;
     }
@@ -52,7 +52,7 @@ option(Striker)
     transition
     {
       if(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut)
-        goto searchForBall;
+        goto rotateHeadToSearch;
       if(std::abs(theLibCodeRelease.angleToGoal) < 10_deg && std::abs(theBallModel.estimate.position.y()) < 100.f)
         goto alignBehindBall;
     }
@@ -68,7 +68,7 @@ option(Striker)
     transition
     {
       if(theLibCodeRelease.timeSinceBallWasSeen > theBehaviorParameters.ballNotSeenTimeOut)
-        goto searchForBall;
+        goto rotateHeadToSearch;
       if(theLibCodeRelease.between(theBallModel.estimate.position.y(), 20.f, 50.f)
          && theLibCodeRelease.between(theBallModel.estimate.position.x(), 140.f, 170.f)
          && std::abs(theLibCodeRelease.angleToGoal) < 2_deg)
@@ -92,6 +92,22 @@ option(Striker)
     {
       HeadControlMode(HeadControl::lookForward);
       InWalkKick(WalkKickVariant(WalkKicks::forward, Legs::left), Pose2f(theLibCodeRelease.angleToGoal, theBallModel.estimate.position.x() - 160.f, theBallModel.estimate.position.y() - 55.f));
+    }
+  }
+
+  state(rotateHeadToSearch)
+  {
+    transition
+    {
+      if(theLibCodeRelease.timeSinceBallWasSeen < 300)
+        goto turnToBall;
+      if(theLibCodeRelease.timeSinceBallWasSeen > (7000 + theBehaviorParameters.ballNotSeenTimeOut))
+        goto searchForBall;
+    }
+    action
+    {
+      lookLeftAndRight();
+      Stand();
     }
   }
 
